@@ -36,4 +36,4 @@ config = uvicorn.Config("server.app:app", log_level=level, ws="wsproto", proxy_h
 server = uvicorn.Server(config)
 server.run(sockets=[sock])
 # uvicorn returns normally after a signal; any other return is unexpected.
-sys.exit(0 if server.should_exit else 1)
+sys.exit(0 if (server.started and server.should_exit) else 1)
