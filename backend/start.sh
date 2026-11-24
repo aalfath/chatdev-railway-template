@@ -35,6 +35,5 @@ chown -h 1000:1000 /app/yaml_instance /app/WareHouse /app/data /app/logs /app/te
 
 export HOME="$DATA/home" UV_CACHE_DIR="$DATA/cache/uv" TEMP_CODE_DIR="$DATA/temp"
 cd /app
-echo "chatdev: backend starting on [::]:$PORT, data in $DATA"
-exec setpriv --reuid=1000 --regid=1000 --init-groups \
-  python server_main.py --host "::" --port "$PORT" --log-level warning
+echo "chatdev: backend starting, data in $DATA"
+exec setpriv --reuid=1000 --regid=1000 --init-groups python /usr/local/bin/chatdev-serve.py

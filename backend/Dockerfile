@@ -36,7 +36,8 @@ RUN mkdir -p /opt/chatdev-defaults \
  && mv /app/functions/function_calling /opt/chatdev-defaults/function_calling \
  && chown -R appuser:appuser /app
 COPY start.sh /usr/local/bin/chatdev-start
-RUN chmod 0755 /usr/local/bin/chatdev-start
+COPY serve.py /usr/local/bin/chatdev-serve.py
+RUN chmod 0755 /usr/local/bin/chatdev-start /usr/local/bin/chatdev-serve.py
 ENV PATH="/opt/venv/bin:${PATH}" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
