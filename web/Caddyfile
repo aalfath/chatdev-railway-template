@@ -1,0 +1,44 @@
+{
+	admin off
+	auto_https off
+	persist_config off
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+:{$PORT} {
+	encode zstd gzip
+
+	# Health check for Railway: answers only when the backend answers too.
+	handle /healthz {
+		rewrite * /health/live
+		reverse_proxy {$BACKEND_HOST}:{$BACKEND_PORT}
+	}
+
+	handle {
+		basic_auth {
+			{$CHATDEV_USERNAME} {$CHATDEV_PASSWORD_HASH}
+		}
+
+		# Uploading Python tools over HTTP runs that code in the backend.
+		# Upstream limited it to localhost after v2.2.0; we keep it off.
+		@localtool path /api/tools/local /api/tools/local/*
+		handle @localtool {
+			respond "Uploading local tools over the web is disabled on this deployment." 403
+		}
+
+		@backend path /api/* /ws /ws/*
+		handle @backend {
+			reverse_proxy {$BACKEND_HOST}:{$BACKEND_PORT} {
+				flush_interval -1
+			}
+		}
+
+		handle {
+			root * /srv
+			try_files {path} /index.html
+			file_server
+		}
+	}
+}
